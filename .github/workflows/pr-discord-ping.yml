@@ -15,6 +15,10 @@ jobs:
         run: |
           event_json=$(echo '${{ toJson(github.event) }}')
           reviewers=$(echo "$event_json" | jq -r '.requested_reviewers[].login' | tr '\n' ' ')
+          if [ -z "$reviewers" ]; then
+            echo "No reviewers found in the event"
+            exit 1
+          fi
           echo "reviewers=$reviewers" >> $GITHUB_OUTPUT
           echo "Found reviewers: $reviewers"
 
@@ -24,4 +28,6 @@ jobs:
     with:
       pr_url: ${{ github.event.pull_request.html_url }}
       reviewers: ${{ needs.extract-reviewers.outputs.reviewers }}
-    secrets: inherit
+    secrets:
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      REVIEWER_DISCORD_MAP: ${{ secrets.REVIEWER_DISCORD_MAP }}
