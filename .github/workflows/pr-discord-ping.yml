@@ -13,10 +13,8 @@ jobs:
       - name: Extract reviewers from event
         id: get-reviewers
         run: |
-          reviewers=$(jq -r '.requested_reviewers[].login' <<EOF
-${{ toJson(github.event) }}
-EOF
-          )
+          json_b64="${{ toJson(github.event) | toBase64 }}"
+          reviewers=$(echo "$json_b64" | base64 --decode | jq -r '.requested_reviewers[].login' | tr '\n' ' ')
           echo "reviewers=$reviewers" >> $GITHUB_OUTPUT
           echo "Found reviewers: $reviewers"
 
