@@ -1,40 +1,13 @@
-name: notify-reviewers
+name: Trigger Discord Reviewer Ping
 
 on:
-  workflow_call:
-    inputs:
-      pr_url:
-        required: true
-        type: string
-      reviewers:
-        required: true
-        type: string
+  pull_request:
+    types: [review_requested]
 
 jobs:
   notify:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Load reviewer-discord mapping
-        id: load_map
-        run: echo "::set-output name=map::${{ secrets.REVIEWER_DISCORD_MAP }}"
-
-      - name: Notify Discord
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        run: |
-          map='${{ steps.load_map.outputs.map }}'
-          reviewers="${{ inputs.reviewers }}"
-          message=""
-
-          for user in $reviewers; do
-            discord_id=$(echo "$map" | jq -r --arg user "$user" '.[$user]')
-            if [[ "$discord_id" != "null" ]]; then
-              message+="<@$discord_id> "
-            fi
-          done
-
-          if [[ -n "$message" ]]; then
-            curl -X POST "$DISCORD_WEBHOOK_URL" \
-              -H "Content-Type: application/json" \
-              -d "$(jq -n --arg content "$message Please review the PR: ${{ inputs.pr_url }}" '{content: $content}')"
-          fi
+    uses: pusrenk/discord-action/.github/workflows/notify-reviewers.yml@main
+    with:
+      pr_url: ${{ github.event.pull_request.html_url }}
+      reviewers: ${{ join(github.event.requested_reviewers.*.login, ' ') }}
+    secrets: inherit
