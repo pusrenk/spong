@@ -10,19 +10,13 @@ jobs:
     outputs:
       reviewers: ${{ steps.get-reviewers.outputs.reviewers }}
     steps:
-    - name: Extract reviewers from event
-        id: get-reviewers
-        run: |
-          reviewers=$(jq -r '.requested_reviewers[].login' <<EOF
-      ${{ toJson(github.event) }}
-      EOF
-          )
-          echo "reviewers=$reviewers" >> $GITHUB_OUTPUT
-          echo "Found reviewers: $reviewers"
       - name: Extract reviewers from event
         id: get-reviewers
         run: |
-          reviewers=$(echo '${{ toJson(github.event) }}' | jq -r '.requested_reviewers[].login' | tr '\n' ' ')
+          reviewers=$(jq -r '.requested_reviewers[].login' <<EOF
+${{ toJson(github.event) }}
+EOF
+          )
           echo "reviewers=$reviewers" >> $GITHUB_OUTPUT
           echo "Found reviewers: $reviewers"
 
