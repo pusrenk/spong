@@ -13,13 +13,16 @@ jobs:
       - name: Extract reviewers from event
         id: get-reviewers
         run: |
-          event_json=$(echo '${{ toJson(github.event) }}')
-          reviewers=$(echo "$event_json" | jq -r '.requested_reviewers[].login' | tr '\n' ' ')
+          # Properly escape the JSON string
+          event_json='${{ toJSON(github.event) }}'
+          # Use single quotes for the jq command to avoid shell interpretation
+          reviewers=$(echo "$event_json" | jq -r '.requested_reviewers[].login' | tr '\n' ' ' | xargs)
           if [ -z "$reviewers" ]; then
             echo "No reviewers found in the event"
             exit 1
           fi
-          echo "reviewers=$reviewers" >> $GITHUB_OUTPUT
+          # Use printf to handle special characters
+          printf "reviewers=%s\n" "$reviewers" >> $GITHUB_OUTPUT
           echo "Found reviewers: $reviewers"
 
   notify:
