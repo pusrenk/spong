@@ -5,20 +5,22 @@ on:
     types: [review_requested, edited]
 
 jobs:
-  extract-and-notify:
+  extract-reviewers:
     runs-on: ubuntu-latest
-
+    outputs:
+      reviewers: ${{ steps.get-reviewers.outputs.reviewers }}
     steps:
-      - name: Dump reviewers from event
-        id: reviewers
+      - name: Extract reviewers from event
+        id: get-reviewers
         run: |
           reviewers=$(echo '${{ toJson(github.event) }}' | jq -r '.requested_reviewers[].login' | tr '\n' ' ')
           echo "reviewers=$reviewers" >> $GITHUB_OUTPUT
-          echo "🧪 Reviewers found: $reviewers"
+          echo "Found reviewers: $reviewers"
 
-      - name: Call reusable Discord ping workflow
-        uses: pusrenk/discord-action/.github/workflows/notify-reviewers.yml@main
-        with:
-          pr_url: ${{ github.event.pull_request.html_url }}
-          reviewers: ${{ steps.reviewers.outputs.reviewers }}
-        secrets: inherit
+  notify:
+    needs: extract-reviewers
+    uses: pusrenk/discord-action/.github/workflows/notify-reviewers.yml@main
+    with:
+      pr_url: ${{ github.event.pull_request.html_url }}
+      reviewers: ${{ needs.extract-reviewers.outputs.reviewers }}
+    secrets: inherit
