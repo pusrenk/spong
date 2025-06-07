@@ -12,9 +12,7 @@ jobs:
     steps:
       - name: Extract reviewers from event
         id: get-reviewers
-        run: |
-          reviewers=echo ${{ toJson(github.event.pull_request.requested_reviewers) }}
-          echo "Found reviewers: $reviewers"
+        run: reviewers=echo ${{ toJson(github.event.pull_request.requested_reviewers) }}
 
   notify:
     needs: extract-reviewers
