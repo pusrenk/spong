@@ -5,6 +5,7 @@ rust-service
 
 current structure
 
+```bash
 my_project/
 ├── Cargo.toml
 ├── Cargo.lock
@@ -27,3 +28,4 @@ my_project/
     └── utils/           # Utility functions and helpers
         ├── mod.rs
         └── logger.rs
+```
