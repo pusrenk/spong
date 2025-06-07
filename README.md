@@ -1,31 +1,33 @@
 # spong
 Sistem PengelOlaan uaNG
 
-rust-service
 
-current structure
+
+current structure use combination of Domain-Driven Design (DDD) and Clean Architecture
+reason : to make it scaleable along with the ability seperate each business logic
 
 ```bash
-my_project/
-├── Cargo.toml
-├── Cargo.lock
-└── src/
-    ├── main.rs          # Entry point (for binaries)
-    ├── lib.rs           # Main library file
-    ├── config.rs        # Configuration loading (e.g., using `config` or `dotenvy`)
-    ├── routes/          # For web apps: route handlers
-    │   ├── mod.rs       # for initiate module to the rust
-    │   └── user.rs
-    ├── handlers/        # Business logic
-    │   ├── mod.rs
-    │   └── user_handler.rs
-    ├── models/          # Structs representing data models or DB schemas
-    │   ├── mod.rs
-    │   └── user.rs
-    ├── services/        # Reusable services (e.g. auth, database)
-    │   ├── mod.rs
-    │   └── db.rs
-    └── utils/           # Utility functions and helpers
-        ├── mod.rs
-        └── logger.rs
+📦 spong
+├─ src
+│  └─ transaction
+│     ├─ handlers
+│     │  ├─ http
+│     │  │  └─ transaction.rs // this one is for request controller with restful http
+│     │  └─ rpc
+│     │     └─ transaction.rs // this one is for request controller with rpc
+│     ├─ services
+│     │  └─ transaction.rs // this one we can call usecase/domain layer
+│     ├─ storage/repository
+│     │  └─ transaction.rs // this one we can call data layer
+│     ├─ entity
+│     │  └─ transaction.rs // this one is for entity of the domain
+│     └─ models
+│        ├─ request.rs // this one is for request payload
+│        └─ response.rs // this one is for response payload
+└─ pkg
+   ├─ database
+   │  └─ database.rs // db config
+   └─ utils
+      └─ logger.rs // log function to be used at at fn
+      └─ constant.rs // all possible global var that not dynamically change can be store here to make it cleaner
 ```
