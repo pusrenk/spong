@@ -28,6 +28,4 @@ jobs:
     with:
       pr_url: ${{ github.event.pull_request.html_url }}
       reviewers: ${{ needs.extract-reviewers.outputs.reviewers }}
-    secrets:
-      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-      REVIEWER_DISCORD_MAP: ${{ secrets.REVIEWER_DISCORD_MAP }}
+    secrets: inherit
